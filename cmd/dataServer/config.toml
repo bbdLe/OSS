@@ -1,0 +1,4 @@
+[server]
+    address = "localhost:5000"
+    storage_path = "/home/linen/storage"
+    rabbitmq = "amqp://linen:linen@localhost:5672"
