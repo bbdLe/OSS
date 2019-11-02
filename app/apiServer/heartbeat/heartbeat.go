@@ -3,7 +3,6 @@ package heartbeat
 import (
 	"OSS/app/apiServer/config"
 	"OSS/comm/rabbitmq"
-	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -32,7 +31,6 @@ func Heartbeat() {
 		mutex.Lock()
 		dataServers[dataAddr] = time.Now()
 		mutex.Unlock()
-		fmt.Println(dataServers)
 	}
 }
 

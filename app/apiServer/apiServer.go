@@ -2,8 +2,9 @@ package apiServer
 
 import (
 	"OSS/app/apiServer/config"
-	"OSS/app/apiServer/objects"
 	"OSS/app/apiServer/heartbeat"
+	"OSS/app/apiServer/locate"
+	"OSS/app/apiServer/objects"
 	"log"
 	"net/http"
 )
@@ -20,5 +21,6 @@ func Run(cfgFile string) {
 	go heartbeat.Heartbeat()
 
 	http.HandleFunc("/objects/", objects.Handler)
+	http.HandleFunc("/locate/", locate.Handler)
 	log.Fatal(http.ListenAndServe(config.ServerCfg.Server.Address, nil))
 }

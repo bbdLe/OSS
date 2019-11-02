@@ -3,6 +3,7 @@ package dataServer
 import (
 	"OSS/app/dataServer/config"
 	"OSS/app/dataServer/heartbeat"
+	"OSS/app/dataServer/locate"
 	"time"
 )
 
@@ -13,6 +14,7 @@ func Run(cfgFile string) {
 	}
 
 	go heartbeat.Heartbeat()
+	go locate.Locate()
 	for {
 		time.Sleep(time.Second)
 	}
