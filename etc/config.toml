@@ -1,2 +1,3 @@
 [server]
-    address = ":4000"
+    address = "localhost:4000"
+    storage_path = "/home/linen/storage"

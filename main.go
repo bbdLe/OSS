@@ -2,9 +2,10 @@ package main
 
 import (
 	"OSS/config"
+	"OSS/objects"
 	"flag"
-	"fmt"
 	"log"
+	"net/http"
 )
 
 var (
@@ -19,5 +20,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%v", config.ServerCfg.Server)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.Println("Listening on :", config.ServerCfg.Server.Address)
+
+	http.HandleFunc("/objects/", objects.Handler)
+	log.Fatal(http.ListenAndServe(config.ServerCfg.Server.Address, nil))
 }

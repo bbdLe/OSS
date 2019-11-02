@@ -6,6 +6,7 @@ import (
 
 type server struct {
 	Address string
+	StoragePath string `mapstructure:"storage_path"`
 }
 
 type config struct {
