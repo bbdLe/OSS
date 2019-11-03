@@ -20,4 +20,5 @@ func TestGet(t *testing.T) {
 	if string(b) != "hello, world" {
 		t.Errorf("except : %s, actual : %s", "hello, world", string(b))
 	}
+	_ = gs.Close()
 }
