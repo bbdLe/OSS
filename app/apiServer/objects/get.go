@@ -34,7 +34,6 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	if metaData.Hash == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return

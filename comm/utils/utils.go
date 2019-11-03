@@ -1,14 +1,12 @@
 package utils
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 )
 
 func GetHashFromHeader(header http.Header) string {
 	digest := header.Get("digest")
-	log.Println(digest)
 	if len(digest) < 9 {
 		return ""
 	}
