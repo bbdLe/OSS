@@ -22,5 +22,6 @@ func Run(cfgFile string) {
 
 	http.HandleFunc("/objects/", objects.Handler)
 	http.HandleFunc("/locate/", locate.Handler)
+	http.HandleFunc("/version/", objects.VersionHandler)
 	log.Fatal(http.ListenAndServe(config.ServerCfg.Server.Address, nil))
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	url2 "net/url"
 	"strings"
@@ -91,6 +92,35 @@ func SearchLatestVersion(server string, name string) (meta Metadata, err error){
 		meta = sr.Hits.Hits[0].Source
 	}
 	return
+}
+
+func SearchAllVersion(server string, name string, from int, size int) ([]Metadata, error) {
+	url := fmt.Sprintf("http://%s/metadata/_search?=sort=name,version&from=%d&size=%d",
+		server, from, size)
+	if name != "" {
+		url += "&q=name:" + name
+	}
+	log.Println(url)
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if r.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get all version : %d", r.StatusCode)
+	}
+
+	metas := make([]Metadata, 0)
+	result, _ := ioutil.ReadAll(r.Body)
+	var sr searchResult
+	err = json.Unmarshal(result, &sr)
+	if err != nil {
+		return nil, err
+	}
+	for i := range sr.Hits.Hits {
+		metas = append(metas, sr.Hits.Hits[i].Source)
+	}
+
+	return metas, nil
 }
 
 func GetMetadata(server string, name string, version int) (Metadata, error) {
