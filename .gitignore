@@ -1,1 +1,3 @@
 OSS
+cmd/dataServer/dataServer
+cmd/apiServer/apiServer
