@@ -3,6 +3,7 @@ package heartbeat
 import (
 	"OSS/app/apiServer/config"
 	"OSS/comm/rabbitmq"
+	"math/rand"
 	"strconv"
 	"sync"
 	"time"
@@ -44,5 +45,25 @@ func removeExpiredDataServer() {
 			}
 		}
 		mutex.Unlock()
+	}
+}
+
+func getAllDataServer() []string {
+	mutex.Lock()
+	defer mutex.Unlock()
+	servers := make([]string, 0, len(dataServers))
+	for s, _ := range dataServers {
+		servers = append(servers, s)
+	}
+	return servers
+}
+
+func GetRandDataServer() string {
+	servers := getAllDataServer()
+	n := len(servers)
+	if n == 0 {
+		return ""
+	} else {
+		return servers[rand.Intn(n)]
 	}
 }

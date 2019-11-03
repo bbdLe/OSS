@@ -7,7 +7,7 @@ import (
 )
 
 type GetStream struct {
-	reader io.ReadCloser
+	reader io.Reader
 }
 
 func newGetStream(url string) (*GetStream, error) {
@@ -30,8 +30,4 @@ func NewGetStream(server string, object string) (*GetStream, error) {
 
 func (s *GetStream) Read(p []byte) (int, error) {
 	return s.reader.Read(p)
-}
-
-func (s *GetStream) Close() error {
-	return s.reader.Close()
 }

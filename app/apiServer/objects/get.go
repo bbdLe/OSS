@@ -27,8 +27,4 @@ func get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	io.Copy(w, stream)
-	err = stream.Close()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
 }
