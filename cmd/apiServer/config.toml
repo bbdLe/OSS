@@ -2,3 +2,4 @@
     address = "localhost:4000"
     storage_path = "/home/linen/storage"
     rabbitmq = "amqp://linen:linen@localhost:5672"
+    es = "localhost:9200"

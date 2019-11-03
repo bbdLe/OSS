@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	url2 "net/url"
 	"strings"
@@ -85,7 +84,6 @@ func SearchLatestVersion(server string, name string) (meta Metadata, err error){
 	result, _ := ioutil.ReadAll(r.Body)
 	var sr searchResult
 	err = json.Unmarshal(result, &sr)
-	log.Println(sr)
 	if err != nil {
 		return
 	}
@@ -109,4 +107,13 @@ func DelMetadata(server string, name string, version int) {
 	client := http.Client{}
 	request, _ := http.NewRequest("DELETE", url, nil)
 	client.Do(request)
+}
+
+func AddVersion(server string, name string, hash string, size int64) error {
+	data, err := GetMetadata(server, name, 0)
+	if err != nil {
+		return err
+	}
+	err = PutMetaData(server, name, data.Version + 1, size, hash)
+	return err
 }

@@ -6,6 +6,7 @@ type server struct {
 	Address string
 	StoragePath string `mapstructure:"storage_path"`
 	RabbitMq string
+	ES string
 }
 
 type config struct {
