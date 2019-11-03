@@ -4,7 +4,9 @@ import (
 	"OSS/app/dataServer/config"
 	"OSS/app/dataServer/heartbeat"
 	"OSS/app/dataServer/locate"
-	"time"
+	"OSS/app/dataServer/objects"
+	"log"
+	"net/http"
 )
 
 func Run(cfgFile string) {
@@ -15,7 +17,8 @@ func Run(cfgFile string) {
 
 	go heartbeat.Heartbeat()
 	go locate.Locate()
-	for {
-		time.Sleep(time.Second)
-	}
+
+	log.Println("Listening on", config.ServerCfg.Server.Address)
+	http.HandleFunc("/objects/", objects.Handler)
+	log.Fatal(http.ListenAndServe(config.ServerCfg.Server.Address, nil))
 }
