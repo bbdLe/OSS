@@ -13,4 +13,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		post(w, r)
 		return
 	}
+	if r.Method == "PATCH" {
+		patch(w, r)
+		return
+	}
 }

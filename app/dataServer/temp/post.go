@@ -40,14 +40,14 @@ func post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	f, err := os.Create(path.Join(config.ServerCfg.Server.StoragePath, "temp", t.Uuid) + ".bat")
+	f, err := os.Create(path.Join(config.ServerCfg.Server.StoragePath, "temp", t.Uuid) + ".dat")
 	if err != nil {
 		log.Println("create file fail :", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
-	f.Write([]byte(t.Uuid))
+	w.Write([]byte(uuid))
 }
 
 func (t *tempInfo) WriteToFile() error {
