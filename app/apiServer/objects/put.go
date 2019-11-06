@@ -6,6 +6,8 @@ import (
 	"OSS/comm/es"
 	"OSS/comm/httpstream"
 	"OSS/comm/utils"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"log"
@@ -22,7 +24,9 @@ func put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status, err := storeObject(r.Body, url.PathEscape(hash))
+	size := utils.GetSizeFromHeader(r.Header)
+
+	status, err := storeObject(r.Body, url.PathEscape(hash), size)
 	if err != nil {
 		log.Printf("storeObject error : %v, code : %d", err, status)
 		w.WriteHeader(status)
@@ -30,7 +34,6 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	name := strings.Split(r.URL.EscapedPath(), "/")[2]
-	size := utils.GetSizeFromHeader(r.Header)
 	err = es.AddVersion(config.ServerCfg.Server.ES, name, hash, size)
 	if err != nil {
 		log.Println("AddVersion failed", err)
@@ -39,23 +42,28 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func storeObject(reader io.Reader, name string) (int, error) {
+func storeObject(reader io.Reader, name string, size int64) (int, error) {
 	dataServer := heartbeat.GetRandDataServer()
 	if dataServer == "" {
 		log.Println("dataServer is empty")
 		return http.StatusInternalServerError, fmt.Errorf("dataServer empty")
 	}
 
-	stream, err := httpstream.NewPutStream(dataServer, name)
+	stream, err := httpstream.NewTempPutStream(dataServer, name, size)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	io.Copy(stream, reader)
-	err = stream.Close()
-	if err != nil {
-		return http.StatusInternalServerError, err
+	r := io.TeeReader(reader, stream)
+	s := sha256.New()
+	io.Copy(s, r)
+	hash := base64.StdEncoding.EncodeToString(s.Sum(nil))
+	if hash != name {
+		stream.Commit(false)
+		log.Println("Hash wrong")
+		return http.StatusBadRequest, fmt.Errorf("Hash Worng")
+	} else {
+		stream.Commit(true)
+		return http.StatusOK, nil
 	}
-
-	return http.StatusOK, nil
 }
