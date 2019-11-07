@@ -19,7 +19,3 @@ func Locate(file string) string {
 	s, _ := strconv.Unquote(string(msg.Body))
 	return s
 }
-
-func Exist(file string) bool {
-	return Locate(file) != ""
-}

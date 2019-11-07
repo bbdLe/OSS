@@ -3,14 +3,33 @@ package locate
 import (
 	"OSS/app/dataServer/config"
 	"OSS/comm/rabbitmq"
-	"os"
-	"path"
+	"path/filepath"
 	"strconv"
+	"sync"
 )
 
-func IsExist(file string) bool {
-	_, err := os.Stat(file)
-	return !os.IsNotExist(err)
+var (
+	mutex sync.Mutex
+	objects = make(map[string]int)
+)
+
+func Add(hash string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	objects[hash] = 1
+}
+
+func Del(hash string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	delete(objects, hash)
+}
+
+func locate(hash string) bool {
+	mutex.Lock()
+	defer mutex.Unlock()
+	_, ok := objects[hash]
+	return ok
 }
 
 func Locate() {
@@ -23,8 +42,16 @@ func Locate() {
 		if err != nil {
 			panic(err)
 		}
-		if IsExist(path.Join(config.ServerCfg.Server.StoragePath, "objects", file)) {
+		if locate(file) {
 			mq.Send(msg.ReplyTo, config.ServerCfg.Server.Address)
 		}
+	}
+}
+
+func CollectObject() {
+	files, _ := filepath.Glob(config.ServerCfg.Server.StoragePath + "/objects/*")
+	for i := range files {
+		hash := filepath.Base(files[i])
+		objects[hash] = 1
 	}
 }

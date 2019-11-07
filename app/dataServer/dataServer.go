@@ -16,6 +16,7 @@ func Run(cfgFile string) {
 		panic(err)
 	}
 
+	locate.CollectObject()
 	go heartbeat.Heartbeat()
 	go locate.Locate()
 
