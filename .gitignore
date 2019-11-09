@@ -1,3 +1,6 @@
 OSS
 cmd/dataServer/dataServer
 cmd/apiServer/apiServer
+node_modules/
+package-lock.json
+package.json
