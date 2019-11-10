@@ -2,9 +2,10 @@ package objects
 
 import (
 	"OSS/app/apiServer/config"
+	"OSS/app/apiServer/heartbeat"
 	"OSS/app/apiServer/locate"
 	"OSS/comm/es"
-	"OSS/comm/httpstream"
+	"OSS/comm/rs"
 	"io"
 	"log"
 	"net/http"
@@ -39,17 +40,29 @@ func get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server := locate.Locate(url.PathEscape(metaData.Hash))
-	if server == "" {
+	locateInfos := locate.Locate(metaData.Hash)
+	if len(locateInfos) < rs.DataShards {
+		log.Printf("locateInfos less than rs.DataShards : %d(%s)\n", len(locateInfos), url.PathEscape(metaData.Hash))
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	stream, err := httpstream.NewGetStream(server, url.PathEscape(metaData.Hash))
+	dataServers := make([]string, 0)
+	if len(locateInfos) < rs.AllShares {
+		dataServers = heartbeat.ChooseRandomDataServers(rs.AllShares - len(locateInfos), locateInfos)
+	}
+
+	stream, err := rs.NewRSGetStream(locateInfos, dataServers, url.PathEscape(metaData.Hash), metaData.Size)
+	defer stream.Close()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	io.Copy(w, stream)
+	_, err = io.Copy(w, stream)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 }

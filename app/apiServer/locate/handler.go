@@ -1,6 +1,7 @@
 package locate
 
 import (
+	"OSS/comm/rs"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -12,7 +13,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	info := Locate(strings.Split(r.URL.EscapedPath(), "/")[2])
-	if info == "" {
+	if len(info) < rs.DataShards {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else {

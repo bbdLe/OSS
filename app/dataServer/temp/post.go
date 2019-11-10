@@ -65,3 +65,14 @@ func (t *tempInfo) WriteToFile() error {
 
 	return err
 }
+
+func (t *tempInfo) hash() string {
+	s := strings.Split(t.Name, ".")
+	return s[0]
+}
+
+func (t *tempInfo) id() int {
+	s := strings.Split(t.Name, ".")
+	id, _ := strconv.Atoi(s[1])
+	return id
+}

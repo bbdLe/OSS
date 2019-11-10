@@ -4,7 +4,7 @@ import (
 	"OSS/app/apiServer/config"
 	"OSS/app/apiServer/heartbeat"
 	"OSS/comm/es"
-	"OSS/comm/httpstream"
+	"OSS/comm/rs"
 	"OSS/comm/utils"
 	"crypto/sha256"
 	"encoding/base64"
@@ -43,13 +43,13 @@ func put(w http.ResponseWriter, r *http.Request) {
 }
 
 func storeObject(reader io.Reader, name string, size int64) (int, error) {
-	dataServer := heartbeat.GetRandDataServer()
-	if dataServer == "" {
-		log.Println("dataServer is empty")
-		return http.StatusInternalServerError, fmt.Errorf("dataServer empty")
+	dataServers := heartbeat.ChooseRandomDataServers(rs.AllShares, nil)
+	if len(dataServers) < rs.AllShares {
+		log.Println("dataServers too less : %d", len(dataServers))
+		return http.StatusInternalServerError, fmt.Errorf("dataServers not empty")
 	}
 
-	stream, err := httpstream.NewTempPutStream(dataServer, name, size)
+	stream, err := rs.NewRSPutStream(dataServers, name, size)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

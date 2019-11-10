@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -16,12 +17,14 @@ func isExist(file string) bool {
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
-	file := path.Join(config.ServerCfg.Server.StoragePath, "objects",
-		strings.Split(r.URL.EscapedPath(), "/")[2])
-	if !isExist(file) {
+	name := strings.Split(r.URL.EscapedPath(), "/")[2]
+	files, _ := filepath.Glob(path.Join(config.ServerCfg.Server.StoragePath, "objects",
+		name) + ".*")
+	if len(files) != 1 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	file := files[0]
 
 	f, err := os.Open(file)
 	if err != nil {

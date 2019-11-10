@@ -2,8 +2,13 @@ package temp
 
 import (
 	"OSS/app/dataServer/config"
+	"OSS/app/dataServer/locate"
+	"crypto/sha256"
+	"encoding/base64"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -35,9 +40,18 @@ func put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("recv commit")
 	commitFile(uuidDataPath, info)
 }
 
 func commitFile(tempFile string, info *tempInfo) {
-	os.Rename(tempFile, path.Join(config.ServerCfg.Server.StoragePath, "objects", info.Name))
+	f, _ := os.Open(tempFile)
+	h := sha256.New()
+	io.Copy(h, f)
+	hash := url.PathEscape(base64.StdEncoding.EncodeToString(h.Sum(nil)))
+	err := os.Rename(tempFile, path.Join(config.ServerCfg.Server.StoragePath, "objects", info.Name) + "." + hash)
+	if err != nil {
+		log.Println(err)
+	}
+	locate.Add(info.hash(), info.id())
 }
