@@ -21,3 +21,21 @@ func GetSizeFromHeader(header http.Header) int64 {
 	size, _ := strconv.ParseInt(header.Get("content-length"), 0, 64)
 	return size
 }
+
+func GetOffsetFromHeader(header http.Header) int64 {
+	byteRange := header.Get("range")
+	if len(byteRange) < 7 {
+		return 0
+	}
+
+	if byteRange[:6] != "bytes=" {
+		return 0
+	}
+
+	n, err := strconv.ParseInt(byteRange[6:], 0, 64)
+	if err != nil {
+		return 0
+	} else {
+		return n
+	}
+}

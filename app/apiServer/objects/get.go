@@ -6,6 +6,8 @@ import (
 	"OSS/app/apiServer/locate"
 	"OSS/comm/es"
 	"OSS/comm/rs"
+	"OSS/comm/utils"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -57,6 +59,13 @@ func get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	n := utils.GetOffsetFromHeader(r.Header)
+	if n != 0 {
+		stream.Seek(n, io.SeekCurrent)
+		w.Header().Set("content-range", fmt.Sprintf("%d-%d/%d", n, metaData.Size - 1, metaData.Size))
+		w.WriteHeader(http.StatusPartialContent)
 	}
 
 	_, err = io.Copy(w, stream)
