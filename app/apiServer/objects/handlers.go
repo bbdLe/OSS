@@ -15,11 +15,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		del(w, r)
 		return
 	} else if r.Method == http.MethodPost {
-
+		post(w, r)
 		return
 	}
-
-
 
 	w.WriteHeader(http.StatusInternalServerError)
 }

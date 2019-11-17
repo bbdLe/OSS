@@ -76,3 +76,7 @@ func (w *TempPutStream) Commit(succ bool) {
 		return
 	}
 }
+
+func NewTempGetStream(server, uuid string) (*GetStream, error) {
+	return newGetStream("http://" + server + "/temp/" + uuid)
+}
