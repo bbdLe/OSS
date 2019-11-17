@@ -5,6 +5,7 @@ import (
 	"OSS/app/apiServer/heartbeat"
 	"OSS/app/apiServer/locate"
 	"OSS/app/apiServer/objects"
+	"OSS/app/apiServer/temp"
 	"log"
 	"net/http"
 )
@@ -23,5 +24,6 @@ func Run(cfgFile string) {
 	http.HandleFunc("/objects/", objects.Handler)
 	http.HandleFunc("/locate/", locate.Handler)
 	http.HandleFunc("/version/", objects.VersionHandler)
+	http.HandleFunc("/temp/", temp.Handler)
 	log.Fatal(http.ListenAndServe(config.ServerCfg.Server.Address, nil))
 }
