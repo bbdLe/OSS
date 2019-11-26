@@ -65,6 +65,7 @@ func (w *TempPutStream) Commit(succ bool) {
 	}
 
 	request, err := http.NewRequest(method, "http://" + w.Server + "/temp/" + w.Uuid, nil)
+	log.Println("http://" + w.Server + "/temp/" + w.Uuid)
 	if err != nil {
 		log.Println("NewRequest failed ", err)
 		return

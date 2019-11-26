@@ -15,6 +15,7 @@ func Run(cfgFile string) {
 	if err != nil {
 		panic(err)
 	}
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	locate.CollectObject()
 	go heartbeat.Heartbeat()
