@@ -2,6 +2,7 @@ package objects
 
 import (
 	"OSS/app/dataServer/config"
+	"compress/gzip"
 	"io"
 	"log"
 	"net/http"
@@ -32,5 +33,13 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	io.Copy(w, f)
+	defer f.Close()
+	r2, err := gzip.NewReader(f)
+	if err != nil {
+		log.Println("gzip.NewReader failed :", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer r2.Close()
+	io.Copy(w, r2)
 }

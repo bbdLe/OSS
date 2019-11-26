@@ -7,6 +7,7 @@ import (
 	"OSS/comm/es"
 	"OSS/comm/rs"
 	"OSS/comm/utils"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
@@ -68,10 +69,31 @@ func get(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusPartialContent)
 	}
 
-	_, err = io.Copy(w, stream)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusNotFound)
-		return
+	acceptGzip := false
+	encoding := r.Header["Accept-Encoding"]
+	for i := range encoding {
+		if encoding[i] == "gzip" {
+			acceptGzip = true
+			break
+		}
+	}
+
+	if acceptGzip {
+		w.Header().Set("Accept-Encoding", "gzip")
+		w2 := gzip.NewWriter(w)
+		defer w2.Close()
+		_, err := io.Copy(w2, stream)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	} else {
+		_, err = io.Copy(w, stream)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"OSS/comm/httpstream"
 	"fmt"
 	"io"
-	"log"
 )
 
 type RSPutStream struct {
@@ -33,7 +32,6 @@ func NewRSPutStream(dataServer []string, hash string, size int64) (*RSPutStream,
 func (s *RSPutStream) Commit(succ bool) {
 	s.Flush()
 	for i := range s.writers {
-		log.Println("commit")
 		s.writers[i].(*httpstream.TempPutStream).Commit(succ)
 	}
 	s.Close()
